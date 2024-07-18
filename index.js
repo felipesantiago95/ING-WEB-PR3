@@ -19,10 +19,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
 // Rutas
 const establecimientoRoutes = require('./routes/establecimiento');
 const aforoRoutes = require('./routes/aforo');
@@ -33,3 +29,7 @@ app.use('/api/establecimiento', establecimientoRoutes);
 app.use('/api/aforo', aforoRoutes);
 app.use('/api/categoria', categoriaRoutes);
 app.use('/api/venta', ventaRoutes); // Usar las rutas de venta
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
