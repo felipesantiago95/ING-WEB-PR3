@@ -195,17 +195,4 @@ Este proyecto es una API RESTful construida con Node.js y Express.js para gestio
 - `DELETE /api/venta/:id`
   - Elimina una venta.
 
-## Contribuciones
 
-Las contribuciones son bienvenidas. Por favor sigue estos pasos:
-
-1. Haz un fork del repositorio.
-2. Crea una nueva rama (`git checkout -b feature/nueva-funcionalidad`).
-3. Realiza tus cambios.
-4. Haz commit de tus cambios (`git commit -m 'Añadir nueva funcionalidad'`).
-5. Sube a tu rama (`git push origin feature/nueva-funcionalidad`).
-6. Abre un Pull Request.
-
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
