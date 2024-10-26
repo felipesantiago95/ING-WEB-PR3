@@ -1,29 +1,26 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Orbs are reusable packages of CircleCI configuration that you may share across projects,
-# enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
-# See: https://circleci.com/docs/orb-intro/
+# Orbs provide reusable configurations.
 orbs:
-  # Using the CircleCI Node orb for pre-defined Node.js jobs and executors.
-  # See the Node orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
   node: circleci/node@5.2
 
-# Orchestrate jobs using workflows.
-# See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
-workflows:
-  sample_workflow: # Renamed to clarify it's a workflow configuration.
-    # Define the jobs to run within the workflow.
-    jobs:
-      - node/test:
-          # Specify the Node.js version to use. Relevant tags can be found on the CircleCI Developer Hub:
-          # https://circleci.com/developer/images/image/cimg/node
-          version: '16.10'
-          # Define the package manager to use. Switch to "yarn" if your project uses Yarn.
+# Define the jobs
+jobs:
+  test:
+    # Usa la orb para el entorno de Node.js, pero definiendo comandos personalizados.
+    docker:
+      - image: cimg/node:16.10 # Define la versión de Node.js a utilizar
+    steps:
+      - checkout
+      - node/install-packages: # Instala dependencias usando npm o yarn
           pkg-manager: npm
-          # Adding environment variables to handle cases with no tests.
-          environment:
-            CI: true # Ensures tests run in continuous integration mode
-          # Run npm test with --passWithNoTests to avoid errors if no tests are found.
-          test-command: "npm test -- --passWithNoTests"
+      - run:
+          name: Run Tests
+          command: npm test -- --passWithNoTests
+
+# Define workflows
+workflows:
+  sample_workflow:
+    jobs:
+      - test
