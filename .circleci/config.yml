@@ -5,22 +5,97 @@ version: 2.1
 orbs:
   node: circleci/node@5.2
 
+# Define commands for Slack notifications
+commands:
+  notify_success:
+    description: "Send Slack notification on success"
+    steps:
+      - run:
+          name: Notify Success
+          command: |
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"Job completed successfully!"}' \
+            $SLACK_WEBHOOK_URL
+
+  notify_failure:
+    description: "Send Slack notification on failure"
+    steps:
+      - run:
+          name: Notify Failure
+          command: |
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"Job failed!"}' \
+            $SLACK_WEBHOOK_URL
+
 # Define the jobs
 jobs:
-  test:
-    # Usa la orb para el entorno de Node.js, pero definiendo comandos personalizados.
+  build:
     docker:
-      - image: cimg/node:16.10 # Define la versión de Node.js a utilizar
+      - image: cimg/node:16.10
     steps:
       - checkout
-      - node/install-packages: # Instala dependencias usando npm o yarn
+      - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Run Tests
-          command: npm test -- --passWithNoTests
+          name: Build Application
+          command: npm run build
+      - notify_success
+      - notify_failure
+
+  test_unit:
+    docker:
+      - image: cimg/node:16.10
+    parallelism: 2
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run Unit Tests
+          command: npm test -- --unit
+      - notify_success
+      - notify_failure
+
+  test_integration:
+    docker:
+      - image: cimg/node:16.10
+    parallelism: 2
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run Integration Tests
+          command: npm test -- --integration
+      - notify_success
+      - notify_failure
+
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - run:
+          name: Deploy Application
+          command: echo "Deployment Successful"
+      - notify_success
+      - notify_failure
 
 # Define workflows
 workflows:
-  sample_workflow:
+  test_and_build_workflow:
     jobs:
-      - test
+      - build
+      - test_unit:
+          requires:
+            - build
+      - test_integration:
+          requires:
+            - test_unit
+
+  deploy_workflow:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
